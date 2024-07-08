@@ -6,9 +6,15 @@ pcofins = 0
 
 #Função calcular regime tributário
 def verificar_regime(pis, cofins):
-  if(pis=='1.65' and cofins=='7.6'):
+  pis = float(pis)
+  cofins = float(cofins)
+
+  pis = "{:.2f}".format(pis)
+  cofins = "{:.2f}".format(cofins)
+
+  if(pis=='1.65' and cofins=='7.60'):
     return "Lucro Real"
-  elif(pis=='0.65' and cofins=='2.00'):
+  elif(pis=='0.65' and cofins=='3.00'):
     return "Lucro Presumido"
   elif(pis=='2.10' and cofins=='9.65'):
     return "Importação"
