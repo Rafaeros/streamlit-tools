@@ -5,27 +5,42 @@ ppis = 0
 pcofins = 0
 
 #Função calcular regime tributário
-def verificar_regime(pis, cofins):
+def verificar_regime(natOp, pis, cofins):
   pis = float(pis)
   cofins = float(cofins)
 
+  # Formatando o valor de pis e cofins para apenas 2 casas decimais
   pis = "{:.2f}".format(pis)
   cofins = "{:.2f}".format(cofins)
 
-  if(pis=='1.65' and cofins=='7.60'):
-    return "Lucro Real"
-  elif(pis=='0.65' and cofins=='3.00'):
-    return "Lucro Presumido"
-  elif(pis=='2.10' and cofins=='9.65'):
-    return "Importação"
-  else:
-    return "Simples Nacional"
+  #Verificando se a nota é do modelo  DIR antes de puxar outras informações
+  try:
+    if(natOp=="COMPRA IMPORTAÇÃO P/ INDUSTRIALIZAÇÃO - DIR"):
+      return "Importação - DIR"
+    
+    if(pis=='1.65' and cofins=='7.60'):
+      return "Lucro Real"
+    elif(pis=='0.65' and cofins=='3.00'):
+      return "Lucro Presumido"
+    elif(pis=='2.10' and cofins=='9.65'):
+      return "Importação"
+    else:
+      return "Simples Nacional"
+  except Exception as e:
+    return f"Erro {e}"
 
 def ler_xml(file):
   root = minidom.parse(file)
-  ppis = root.getElementsByTagName('pPIS')[0].childNodes[0].nodeValue
-  pcofins = root.getElementsByTagName('pCOFINS')[0].childNodes[0].nodeValue
-  regime_tributario = verificar_regime(ppis, pcofins)
+  # Coletando natureza da operação da nota fiscal
+  natOp = root.getElementsByTagName('natOp')[0].childNodes[0].nodeValue
+  # Coletando aliquota pis e cofins da nota fiscal
+  try:
+    ppis = root.getElementsByTagName('pPIS')[0].childNodes[0].nodeValue
+    pcofins = root.getElementsByTagName('pCOFINS')[0].childNodes[0].nodeValue
+  except:
+    ppis = '0.00'
+    pcofins = '0.00'
+  regime_tributario = verificar_regime(natOp, ppis, pcofins)
   return regime_tributario
 
 st.title("Verificar Regime Tributário por XML de Nota Fiscal")
