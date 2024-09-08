@@ -1,11 +1,14 @@
 import streamlit as st
+import datetime as dt
 from xml.dom import minidom
+from bs4 import BeautifulSoup
+import requests
+import time
 
 ppis = 0
 pcofins = 0
 
-#Função calcular regime tributário
-def verificar_regime(natOp, pis, cofins):
+def verificar_regime(natOp: str, pis: str, cofins: str) -> str:
   pis = float(pis)
   cofins = float(cofins)
 
@@ -29,7 +32,7 @@ def verificar_regime(natOp, pis, cofins):
   except Exception as e:
     return f"Erro {e}"
 
-def ler_xml(file):
+def ler_xml(file: any) -> str:
   root = minidom.parse(file)
   # Coletando natureza da operação da nota fiscal
   natOp = root.getElementsByTagName('natOp')[0].childNodes[0].nodeValue
@@ -43,13 +46,48 @@ def ler_xml(file):
   regime_tributario = verificar_regime(natOp, ppis, pcofins)
   return regime_tributario
 
-st.title("Verificar Regime Tributário por XML de Nota Fiscal")
+def pagina_regime():
+  st.title("Verificar Regime Tributário por XML de Nota Fiscal")
 
-xml_file = st.file_uploader("Escolha um arquivo XML", type="xml", help="Carregue um arquivo XML para análise", accept_multiple_files=False)
+  xml_file = st.file_uploader("Escolha um arquivo XML", type="xml", help="Carregue um arquivo XML para análise", accept_multiple_files=False)
 
-if(xml_file != None):
-  st.success("Arquivo carregado com sucesso!")
-  read_xml_button = st.button("Ler XML", type="primary")
-  if read_xml_button:
-    regime = ler_xml(xml_file)
-    st.title(f"Regime Tributário: {regime}")
+  if(xml_file != None):
+    st.success("Arquivo carregado com sucesso!")
+    read_xml_button = st.button("Ler XML", type="primary")
+    if read_xml_button:
+      regime = ler_xml(xml_file)
+      st.title(f"Regime Tributário: {regime}")
+
+def buscar_cotacao(moeda: str, data: str) -> str:
+  # m-d-yyyy
+  data_busca = data.strftime("%m-%d-%Y")
+  url = f"https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoMoedaPeriodoFechamento(codigoMoeda='{moeda}',dataInicialCotacao='{data_busca}',dataFinalCotacao='{data_busca}')?$select=cotacaoCompra"
+  response = requests.get(url)
+  time.sleep(1)
+
+  if response.status_code == 200:
+    dados = response.json()
+    cotacao_compra = dados['value'][0]['cotacaoCompra']
+
+    return cotacao_compra
+    
+
+def pagina_cotacao():
+  
+  st.title("Cotação de moedas")
+  m = st.radio("Escolha a Moeda",["USD","EUR","CAD"],index=None)
+  d = st.date_input("Data para verificar a cotação da moeda:", format="DD/MM/YYYY")
+  
+  if st.button("Buscar"):
+    cotacao = buscar_cotacao(m, d)
+    st.write(f"Valor da cotação na data {d.strftime("%d/%m/%Y")}: {cotacao}")
+
+paginas = {
+  "Verificar Regime Tributário": pagina_regime,
+  "Buscar Cotação Moeda": pagina_cotacao
+}
+
+st.sidebar.title("Navegação")
+pagina_selecionada = st.sidebar.selectbox("Selecione uma página", paginas.keys())
+
+paginas[pagina_selecionada]()
