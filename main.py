@@ -71,16 +71,16 @@ def buscar_cotacao(moeda: str, data: str) -> str:
 
     return cotacao_compra
     
-
 def pagina_cotacao():
   
   st.title("Cotação de moedas")
   m = st.radio("Escolha a Moeda",["USD","EUR","CAD"],index=None)
   d = st.date_input("Data para verificar a cotação da moeda:", format="DD/MM/YYYY")
+  d_formatado= d.strftime("%d/%m/%Y")
   
   if st.button("Buscar"):
     cotacao = buscar_cotacao(m, d)
-    st.write(f"Valor da cotação na data {d.strftime("%d/%m/%Y")}: {cotacao}")
+    st.write(f"Valor da cotação na data {d_formatado}: {cotacao}")
 
 paginas = {
   "Verificar Regime Tributário": pagina_regime,
