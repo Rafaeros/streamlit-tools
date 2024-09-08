@@ -1,7 +1,6 @@
 import streamlit as st
 import datetime as dt
 from xml.dom import minidom
-from bs4 import BeautifulSoup
 import requests
 import time
 
