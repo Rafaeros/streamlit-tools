@@ -81,9 +81,37 @@ def pagina_cotacao():
     cotacao = buscar_cotacao(m, d)
     st.write(f"Valor da cotação na data {d_formatado}: {cotacao}")
 
+def calcular_tempo_producao(qtd_pecas: int, colaboradores: int):
+  tempo_por_peca = 60 #segundos
+  horas_por_dia = 8
+  segundos_por_hora = 3600
+
+  tempo_total_segundos = qtd_pecas * tempo_por_peca
+  tempo_total_segundos_colaboradores = tempo_total_segundos / colaboradores
+  tempo_total_horas = tempo_total_segundos_colaboradores / segundos_por_hora
+  dias_trabalho = tempo_total_horas / horas_por_dia
+
+  return tempo_total_horas, dias_trabalho
+
+def pagina_producao():
+  st.title("Tempo Producao TKC145")
+
+  qtd_pecas = st.number_input("Quantidade de peças:")
+  qtd_colaboradoes = st.number_input("Quantidade Colaboradoes:")
+
+
+  calcularTempo = st.button("Calcular tempo de produção:")
+
+  if calcularTempo:
+    horas, dias = calcular_tempo_producao(qtd_pecas, qtd_colaboradoes)
+    if dias < 1:
+      st.write(f"Para produzir {qtd_pecas} peças, com {qtd_colaboradoes} colaboradores, serão necessários aproximadamente: {horas:.2f} horas")
+    else:
+      st.write(f"Para produzir {qtd_pecas} peças, com {qtd_colaboradoes} colaboradores, serão necessários aproximadamente: {dias:.2f} dias")
 paginas = {
   "Verificar Regime Tributário": pagina_regime,
-  "Buscar Cotação Moeda": pagina_cotacao
+  "Buscar Cotação Moeda": pagina_cotacao,
+  "Tempo de Producao": pagina_producao
 }
 
 st.sidebar.title("Navegação")
