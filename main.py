@@ -82,7 +82,7 @@ def pagina_cotacao():
     st.write(f"Valor da cotação na data {d_formatado}: {cotacao}")
 
 def calcular_tempo_producao(qtd_pecas: int, colaboradores: int):
-  tempo_por_peca = 60 #segundos
+  tempo_por_peca = 415 #segundos
   horas_por_dia = 8
   segundos_por_hora = 3600
 
