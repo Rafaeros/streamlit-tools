@@ -95,49 +95,33 @@ def calcular_tempo_producao(qtd_pecas: int, colaboradores: int):
 
   return tempo_total_horas, dias_trabalho
 
-def gerar_grafico_equipe_sipat(teams: pd.DataFrame, colaborators: pd.DataFrame):
-  teams_sorted = teams.sort_values(by='Pontuação', ascending=False)
+def gerar_grafico_equipe_sipat(teams: pd.DataFrame):
+  teams_sorted = teams.sort_values(by='PONTUAÇÃO', ascending=False)
   color_map = {
-    "Preto": "black",
-    "Branco": "white",
-    "Azul": "blue",
-    "Verde": "green"
+    "PRETO": "black",
+    "BRANCO": "white",
+    "AZUL": "blue",
+    "VERDE": "green"
   }
   teams_plot = px.bar(
       teams_sorted,
-      x="Equipe",
-      y="Pontuação",
-      color="Equipe",
+      x="EQUIPE",
+      y="PONTUAÇÃO",
+      color="EQUIPE",
       color_discrete_map=color_map,
-      text="Pontuação"
+      text="PONTUAÇÃO"
   )
-
   teams_plot.update_traces(textposition="outside")
   teams_plot.update_layout(
       title="Pontuação das Equipes",
-      xaxis_title="Equipe",
-      yaxis_title="Pontuação",
+      xaxis_title="EQUIPE",
+      yaxis_title="PONTUAÇÃO",
       showlegend=False,
       bargap=0.3,
   )
   teams_plot.update_traces(marker=dict(line=dict(width=2, color='DarkSlateGrey')))
 
-  colaborators_sorted = colaborators.sort_values(by='Pontuação', ascending=False)
-  colaborators_plot = px.bar(
-      colaborators_sorted,
-      x="Nome",
-      y="Pontuação",
-      color="Nome"
-  )
-  colaborators_plot.update_traces(textposition="outside")
-  colaborators_plot.update_layout(
-      title="Pontuação dos Colaboradores",
-      xaxis_title="Colaborador",
-      yaxis_title="Pontuação",
-      showlegend=False,
-      bargap=0.3
-    )
-  return teams_plot, colaborators_plot
+  return teams_plot
 
 def pagina_gerar_grafico_sipat():
   st.title("Gerar Gráfico de Equipes para SIPAT 2025")
@@ -147,10 +131,8 @@ def pagina_gerar_grafico_sipat():
     read_xlsx_button = st.button("Ler XLSX", type="primary")
     if read_xlsx_button:
       df_teams = pd.read_excel(xlsx_file, sheet_name="Equipes")
-      df_colaboratos = pd.read_excel(xlsx_file, sheet_name="Colaboradores")
-      plot_t, plot_c = gerar_grafico_equipe_sipat(df_teams, df_colaboratos)
+      plot_t = gerar_grafico_equipe_sipat(df_teams)
       st.plotly_chart(plot_t, use_container_width=True)
-      st.plotly_chart(plot_c, use_container_width=True)
   
 
 def pagina_producao():
